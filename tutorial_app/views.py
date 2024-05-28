@@ -17,24 +17,25 @@ def upload_file(request):
         excel_file = request.FILES['file']
         
         # 파일 저장
-        file_path = default_storage.save('test_data.xlsx', ContentFile(excel_file.read()))
-        file_full_path = os.path.join(settings.MEDIA_ROOT, file_path)
+        upload_file_path = default_storage.save('upload_data.xlsx', ContentFile(excel_file.read()))
+        upload_file_full_path = os.path.join(settings.MEDIA_ROOT, upload_file_path)
         
         # 엑셀 파일 읽기
-        excel_data = pd.read_excel(file_full_path)
+        upload_excel_data = pd.read_excel(upload_file_full_path)
         
         # 엑셀 데이터를 JSON 형식으로 변환
-        json_data = excel_data.to_json(orient='records', force_ascii=False)
-        struct_data = json.loads(json_data)
+        upload_json_data = upload_excel_data.to_json(orient='records', force_ascii=False)
+        struct_data = json.loads(upload_json_data)
         
         # JSON 파일 경로 생성
-        json_file_path = os.path.join(settings.MEDIA_ROOT, 'output.json')
+        upload_json_file_path = os.path.join(settings.MEDIA_ROOT, 'upload.json')
         
         # JSON 파일로 저장
-        with open(json_file_path, 'w', encoding='utf-8') as f:
+        with open(upload_json_file_path, 'w', encoding='utf-8') as f:
             json.dump(struct_data, f, ensure_ascii=False, indent=2)
         
         # 성공적인 응답 반환
-        return JsonResponse({'message': 'File uploaded and converted successfully', 'json_file_path': json_file_path})
+        return JsonResponse({'message': 'File uploaded and converted successfully', 
+                             'json_file_path': upload_json_file_path})
     
     return HttpResponse("Only POST method is allowed", status=405)
